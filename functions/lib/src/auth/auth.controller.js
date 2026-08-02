@@ -21,7 +21,11 @@ let AuthController = class AuthController {
         this.auth = auth;
     }
     login(dto) {
-        return this.auth.loginWithTelegram(dto.initData);
+        const initData = dto?.initData || dto?.body?.initData || dto?.payload?.initData;
+        if (!initData) {
+            throw new Error('initData is required');
+        }
+        return this.auth.loginWithTelegram(initData);
     }
 };
 exports.AuthController = AuthController;
