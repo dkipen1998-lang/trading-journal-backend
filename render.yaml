@@ -3,11 +3,13 @@ services:
     name: trading-journal-backend
     env: node
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npx prisma migrate deploy && npm run start:prod
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm run prisma:deploy && npm run start:prod
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NPM_CONFIG_PRODUCTION
+        value: false
       - key: PORT
         value: 10000
       - key: DATABASE_URL
