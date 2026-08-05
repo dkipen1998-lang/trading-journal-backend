@@ -50,6 +50,10 @@ export class CreateTradeDto {
   notes?: string;
 
   @IsOptional()
+  @IsString()
+  profileId?: string;
+
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   tags?: string[];

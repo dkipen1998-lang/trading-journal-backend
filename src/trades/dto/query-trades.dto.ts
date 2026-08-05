@@ -24,6 +24,10 @@ export class QueryTradesDto {
 
   @IsOptional()
   @IsString()
+  profileId?: string;
+
+  @IsOptional()
+  @IsString()
   tag?: string;
 
   @IsOptional()

@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { TradesModule } from './trades/trades.module';
 import { TagsModule } from './tags/tags.module';
 import { SetupsModule } from './setups/setups.module';
+import { ProfilesModule } from './profiles/profiles.module';
 import { ImagesModule } from './images/images.module';
 import { StatsModule } from './stats/stats.module';
 import { ExportModule } from './export/export.module';
@@ -19,6 +20,7 @@ import { ExportModule } from './export/export.module';
     TradesModule,
     TagsModule,
     SetupsModule,
+    ProfilesModule,
     ImagesModule,
     StatsModule,
     ExportModule,

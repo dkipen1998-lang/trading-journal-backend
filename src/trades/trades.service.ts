@@ -23,7 +23,7 @@ export class TradesService {
   }
 
   async list(userId: string, query: QueryTradesDto) {
-    const { status, side, result, setup, timeframe, tag, search, dateFrom, dateTo, page = 1, limit = 20 } = query;
+    const { status, side, result, setup, timeframe, profileId, tag, search, dateFrom, dateTo, page = 1, limit = 20 } = query;
 
     const where: Prisma.TradeWhereInput = { userId };
 
@@ -33,6 +33,7 @@ export class TradesService {
     if (result === 'loss') where.pnl = { lt: 0 };
     if (setup) where.setup = setup;
     if (timeframe) where.timeframe = timeframe;
+    if (profileId) where.profileId = profileId;
     if (tag) where.tradeTags = { some: { tag: { name: tag } } };
     if (search) where.ticker = { contains: search, mode: 'insensitive' };
     if (dateFrom || dateTo) {
@@ -99,6 +100,7 @@ export class TradesService {
     const trade = await this.prisma.trade.create({
       data: {
         userId,
+        profileId: data.profileId,
         ticker: data.ticker,
         side: data.side,
         entryDate: new Date(data.entryDate),
@@ -188,6 +190,7 @@ export class TradesService {
     const clone = await this.prisma.trade.create({
       data: {
         userId,
+        profileId: source.profileId,
         ticker: source.ticker,
         side: source.side,
         status: 'open',
