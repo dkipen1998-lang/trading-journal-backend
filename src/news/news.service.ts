@@ -24,10 +24,6 @@ export class NewsService {
       }
     }
 
-    if (items.length === 0) {
-      return this.fetchYahooFallbackNews();
-    }
-
     return items
       .sort((a, b) => (b.publishedAt || 0) - (a.publishedAt || 0))
       .slice(0, 20);
