@@ -13,7 +13,8 @@ export function calcPnl(params: {
     return { pnl: null, pnlPercent: null, rMultiple: null };
   }
 
-  const dir = side === 'long' ? 1 : -1;
+  const normalizedSide = `${side ?? 'long'}`.toLowerCase();
+  const dir = normalizedSide === 'short' || normalizedSide === 'sell' ? -1 : 1;
   const pnl = (Number(exitPrice) - Number(entryPrice)) * Number(positionSize) * dir;
   const cost = Number(entryPrice) * Number(positionSize);
   const pnlPercent = cost ? (pnl / cost) * 100 : 0;

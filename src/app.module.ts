@@ -10,6 +10,7 @@ import { ProfilesModule } from './profiles/profiles.module';
 import { ImagesModule } from './images/images.module';
 import { StatsModule } from './stats/stats.module';
 import { ExportModule } from './export/export.module';
+import { NewsModule } from './news/news.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ExportModule } from './export/export.module';
     ImagesModule,
     StatsModule,
     ExportModule,
+    NewsModule,
   ],
 })
 export class AppModule {}
