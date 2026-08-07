@@ -17,6 +17,7 @@ export class NewsService {
     ]);
 
     const items: Array<Record<string, any>> = [];
+    const cutoff = Date.now() - 24 * 60 * 60 * 1000;
 
     for (const source of sources) {
       if (source.status === 'fulfilled' && Array.isArray(source.value)) {
@@ -24,9 +25,12 @@ export class NewsService {
       }
     }
 
-    return items
+    const activeItems = items
+      .filter((item) => typeof item.publishedAt === 'number' && item.publishedAt >= cutoff)
       .sort((a, b) => (b.publishedAt || 0) - (a.publishedAt || 0))
       .slice(0, 20);
+
+    return activeItems;
   }
 
   private async fetchFinnhubNews() {
