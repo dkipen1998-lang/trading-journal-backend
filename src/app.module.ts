@@ -12,6 +12,7 @@ import { StatsModule } from './stats/stats.module';
 import { ExportModule } from './export/export.module';
 import { NewsModule } from './news/news.module';
 import { AiModule } from './ai/ai.module';
+import { MarketModule } from './market/market.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AiModule } from './ai/ai.module';
     ExportModule,
     NewsModule,
     AiModule,
+    MarketModule,
   ],
 })
 export class AppModule {}
