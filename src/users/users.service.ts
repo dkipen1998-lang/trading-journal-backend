@@ -12,11 +12,13 @@ export class UsersService {
       update: {
         username: tgUser.username ?? undefined,
         firstName: tgUser.first_name ?? undefined,
+        photoUrl: tgUser.photo_url ?? undefined,
       },
       create: {
         telegramId: BigInt(tgUser.id),
         username: tgUser.username,
         firstName: tgUser.first_name,
+        photoUrl: tgUser.photo_url,
       },
     });
   }

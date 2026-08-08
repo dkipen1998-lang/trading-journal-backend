@@ -11,6 +11,7 @@ import { ImagesModule } from './images/images.module';
 import { StatsModule } from './stats/stats.module';
 import { ExportModule } from './export/export.module';
 import { NewsModule } from './news/news.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { NewsModule } from './news/news.module';
     StatsModule,
     ExportModule,
     NewsModule,
+    AiModule,
   ],
 })
 export class AppModule {}

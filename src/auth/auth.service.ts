@@ -37,6 +37,7 @@ export class AuthService {
         id: user.id,
         username: user.username,
         firstName: user.firstName,
+        photoUrl: user.photoUrl,
       },
     };
   }

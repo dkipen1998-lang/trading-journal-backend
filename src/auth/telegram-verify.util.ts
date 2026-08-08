@@ -25,6 +25,7 @@ export interface TelegramUserPayload {
   id: number;
   username?: string;
   first_name?: string;
+  photo_url?: string;
 }
 
 export function parseTelegramUser(initData: string): TelegramUserPayload | null {
