@@ -33,7 +33,7 @@ export class NewsService {
     return activeItems;
   }
 
-  private async fetchFinnhubNews() {
+  private async fetchFinnhubNews(): Promise<Record<string, any>[]> {
     if (!this.finnhubApiKey) {
       throw new Error('FINNHUB_API_KEY not configured');
     }
@@ -55,7 +55,7 @@ export class NewsService {
     }
 
     return data
-      .map((item: any) => {
+      .map((item: any): Record<string, any> | null => {
         const publishedAt = item.datetime ? item.datetime * 1000 : null;
         const ticker = Array.isArray(item.symbols) ? item.symbols.join(', ') : item.symbol || undefined;
         const title = item.headline || item.summary || item.source || 'Finnhub news';
@@ -73,11 +73,11 @@ export class NewsService {
           newsScore: undefined,
         };
       })
-      .filter(Boolean)
+      .filter((item): item is Record<string, any> => Boolean(item))
       .slice(0, 15);
   }
 
-  private async fetchSecEdgarFilings() {
+  private async fetchSecEdgarFilings(): Promise<Record<string, any>[]> {
     const body = {
       query: 'formType:(8-K OR 10-K OR 10-Q OR 6-K OR 13D OR 13G OR 4 OR 4-F)',
       from: 0,
@@ -106,7 +106,7 @@ export class NewsService {
     }
 
     return hits
-      .map((hit: any) => {
+      .map((hit: any): Record<string, any> | null => {
         const source = hit._source || hit;
         const filedAt = source.filedAt ? new Date(source.filedAt).getTime() : null;
         const ticker = source.symbol || source.ticker || undefined;
@@ -127,7 +127,7 @@ export class NewsService {
           newsScore: undefined,
         };
       })
-      .filter(Boolean)
+      .filter((item): item is Record<string, any> => Boolean(item))
       .slice(0, 10);
   }
 }
