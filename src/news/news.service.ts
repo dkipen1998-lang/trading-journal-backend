@@ -130,48 +130,4 @@ export class NewsService {
       .filter(Boolean)
       .slice(0, 10);
   }
-
-  private async fetchYahooFallbackNews() {
-    try {
-      const response = await fetch('https://finance.yahoo.com/topic/latest-news/', {
-        headers: {
-          'User-Agent': USER_AGENT,
-          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`Yahoo request failed with ${response.status}`);
-      }
-
-      const html = await response.text();
-      const normalized = html.replace(/\n/g, ' ');
-      const items: Array<{ title: string; url: string }> = [];
-      const seen = new Set<string>();
-      const matcher = /<a[^>]+href="([^"]+)"[^>]*>\s*<h3[^>]*>([\s\S]*?)<\/h3>/gi;
-      let match;
-      while ((match = matcher.exec(normalized)) !== null && items.length < 20) {
-        const rawUrl = match[1];
-        const titleHtml = match[2];
-        const title = titleHtml.replace(/<[^>]+>/g, '').trim();
-        if (!title) continue;
-        let url = rawUrl;
-        if (url.startsWith('/')) {
-          url = `https://finance.yahoo.com${url}`;
-        }
-        if (!url.startsWith('http')) continue;
-        if (seen.has(url)) continue;
-        seen.add(url);
-        items.push({ title, url });
-      }
-
-      return items.slice(0, 10).map((item) => ({
-        ...item,
-        source: 'Yahoo Finance',
-        type: 'news',
-        publishedAt: null,
-      }));
-    } catch (error) {
-      throw new InternalServerErrorException('Failed to load latest news from any source');
-    }
-  }
 }
