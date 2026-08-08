@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { TelegramLoginDto } from './dto/telegram-login.dto';
 
@@ -10,7 +10,7 @@ export class AuthController {
   login(@Body() dto: TelegramLoginDto) {
     const initData = dto?.initData || dto?.body?.initData || dto?.payload?.initData;
     if (!initData) {
-      throw new Error('initData is required');
+      throw new BadRequestException('initData is required');
     }
     return this.auth.loginWithTelegram(initData);
   }
