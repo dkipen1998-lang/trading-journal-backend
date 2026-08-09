@@ -22,6 +22,20 @@ export class AiService {
     return this.configService.get<string>('GEMINI_MODEL')?.trim() || 'gemini-1.5';
   }
 
+  private get geminiEndpoint() {
+    const configured = this.configService.get<string>('GEMINI_ENDPOINT')?.trim();
+    if (configured) {
+      return configured.replace(/\/$/, '');
+    }
+
+    const model = this.geminiModel.toLowerCase();
+    if (model.startsWith('gemini-')) {
+      return 'https://gemini.googleapis.com';
+    }
+
+    return 'https://generativelanguage.googleapis.com';
+  }
+
   private getApiKey(provider: string) {
     return provider === 'gemini' ? this.geminiApiKey : this.openaiApiKey;
   }
@@ -71,7 +85,8 @@ export class AiService {
 
   private async geminiChat(message: string, apiKey: string) {
     const model = this.geminiModel;
-    const urlBase = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(model)}:generateText`;
+    const endpoint = this.geminiEndpoint;
+    const urlBase = `${endpoint}/v1/models/${encodeURIComponent(model)}:generateText`;
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
