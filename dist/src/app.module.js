@@ -22,6 +22,7 @@ const export_module_1 = require("./export/export.module");
 const news_module_1 = require("./news/news.module");
 const ai_module_1 = require("./ai/ai.module");
 const market_module_1 = require("./market/market.module");
+const health_module_1 = require("./health/health.module");
 const app_controller_1 = require("./app.controller");
 let AppModule = class AppModule {
 };
@@ -43,6 +44,7 @@ exports.AppModule = AppModule = __decorate([
             news_module_1.NewsModule,
             ai_module_1.AiModule,
             market_module_1.MarketModule,
+            health_module_1.HealthModule,
         ],
         controllers: [app_controller_1.AppController],
     })

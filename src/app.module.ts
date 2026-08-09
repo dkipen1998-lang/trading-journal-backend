@@ -13,6 +13,7 @@ import { ExportModule } from './export/export.module';
 import { NewsModule } from './news/news.module';
 import { AiModule } from './ai/ai.module';
 import { MarketModule } from './market/market.module';
+import { HealthModule } from './health/health.module';
 import { AppController } from './app.controller';
 
 @Module({
@@ -31,6 +32,7 @@ import { AppController } from './app.controller';
     NewsModule,
     AiModule,
     MarketModule,
+    HealthModule,
   ],
   controllers: [AppController],
 })
