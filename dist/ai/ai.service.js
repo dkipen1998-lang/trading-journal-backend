@@ -28,6 +28,17 @@ let AiService = class AiService {
     get geminiModel() {
         return this.configService.get('GEMINI_MODEL')?.trim() || 'gemini-1.5';
     }
+    get geminiEndpoint() {
+        const configured = this.configService.get('GEMINI_ENDPOINT')?.trim();
+        if (configured) {
+            return configured.replace(/\/$/, '');
+        }
+        const model = this.geminiModel.toLowerCase();
+        if (model.startsWith('gemini-')) {
+            return 'https://gemini.googleapis.com';
+        }
+        return 'https://generativelanguage.googleapis.com';
+    }
     getApiKey(provider) {
         return provider === 'gemini' ? this.geminiApiKey : this.openaiApiKey;
     }
@@ -69,12 +80,21 @@ let AiService = class AiService {
     }
     async geminiChat(message, apiKey) {
         const model = this.geminiModel;
-        const url = `https://gemini.googleapis.com/v1/models/${encodeURIComponent(model)}:generateText?key=${encodeURIComponent(apiKey)}`;
+        const endpoint = this.geminiEndpoint;
+        const urlBase = `${endpoint}/v1/models/${encodeURIComponent(model)}:generateText`;
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+        let url = urlBase;
+        if (apiKey.startsWith('AIza')) {
+            url = `${urlBase}?key=${encodeURIComponent(apiKey)}`;
+        }
+        else {
+            headers.Authorization = `Bearer ${apiKey}`;
+        }
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify({
                 prompt: {
                     text: message,
