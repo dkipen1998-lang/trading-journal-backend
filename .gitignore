@@ -1,12 +1,1 @@
-node_modules/
-dist/
-.env
-.env.local
-.env.development
-.env.production
-.env.test
-*.local
-*.log
-
-# Keep example env file tracked
-!.env.example
+node_modules
