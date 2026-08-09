@@ -16,14 +16,34 @@ let AiService = class AiService {
     constructor(configService) {
         this.configService = configService;
     }
+    get aiProvider() {
+        return this.configService.get('AI_PROVIDER')?.trim().toLowerCase() || 'openai';
+    }
     get openaiApiKey() {
         return this.configService.get('OPENAI_API_KEY')?.trim() || '';
     }
-    async chat(message) {
-        const apiKey = this.openaiApiKey;
+    get geminiApiKey() {
+        return this.configService.get('GEMINI_API_KEY')?.trim() || '';
+    }
+    get geminiModel() {
+        return this.configService.get('GEMINI_MODEL')?.trim() || 'gemini-1.5';
+    }
+    getApiKey(provider) {
+        return provider === 'gemini' ? this.geminiApiKey : this.openaiApiKey;
+    }
+    async chat(message, provider) {
+        const aiProvider = provider?.trim()?.toLowerCase() || this.aiProvider;
+        const apiKey = this.getApiKey(aiProvider);
         if (!apiKey) {
-            throw new common_1.InternalServerErrorException('OPENAI_API_KEY is not configured');
+            const missingKey = aiProvider === 'gemini' ? 'GEMINI_API_KEY' : 'OPENAI_API_KEY';
+            throw new common_1.InternalServerErrorException(`${missingKey} is not configured`);
         }
+        if (aiProvider === 'gemini') {
+            return this.geminiChat(message, apiKey);
+        }
+        return this.openaiChat(message, apiKey);
+    }
+    async openaiChat(message, apiKey) {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -43,6 +63,32 @@ let AiService = class AiService {
         }
         const data = await response.json();
         const text = data?.choices?.[0]?.message?.content;
+        return {
+            text: typeof text === 'string' ? text.trim() : '',
+        };
+    }
+    async geminiChat(message, apiKey) {
+        const model = this.geminiModel;
+        const url = `https://gemini.googleapis.com/v1/models/${encodeURIComponent(model)}:generateText?key=${encodeURIComponent(apiKey)}`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt: {
+                    text: message,
+                },
+                temperature: 0.7,
+                maxOutputTokens: 500,
+            }),
+        });
+        if (!response.ok) {
+            const responseText = await response.text();
+            throw new common_1.InternalServerErrorException(`Gemini request failed: ${response.status} ${responseText}`);
+        }
+        const data = await response.json();
+        const text = data?.candidates?.[0]?.output || data?.candidates?.[0]?.content || '';
         return {
             text: typeof text === 'string' ? text.trim() : '',
         };

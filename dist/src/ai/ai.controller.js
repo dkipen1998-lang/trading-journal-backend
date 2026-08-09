@@ -15,23 +15,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AiController = void 0;
 const common_1 = require("@nestjs/common");
 const ai_service_1 = require("./ai.service");
+const chat_ai_dto_1 = require("./dto/chat-ai.dto");
 let AiController = class AiController {
     constructor(aiService) {
         this.aiService = aiService;
     }
-    async chat(message) {
-        if (!message || typeof message !== 'string' || !message.trim()) {
+    async chat(dto) {
+        const message = dto.message?.trim?.();
+        if (!message) {
             throw new common_1.BadRequestException('Message is required');
         }
-        return this.aiService.chat(message.trim());
+        return this.aiService.chat(message, dto.provider);
     }
 };
 exports.AiController = AiController;
 __decorate([
     (0, common_1.Post)('chat'),
-    __param(0, (0, common_1.Body)('message')),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [chat_ai_dto_1.ChatAiDto]),
     __metadata("design:returntype", Promise)
 ], AiController.prototype, "chat", null);
 exports.AiController = AiController = __decorate([
