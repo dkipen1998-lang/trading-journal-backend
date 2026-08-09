@@ -21,18 +21,20 @@ export class AiService {
     return this.configService.get<string>('GEMINI_MODEL')?.trim() || 'gemini-1.5';
   }
 
-  private get apiKey() {
-    return this.aiProvider === 'gemini' ? this.geminiApiKey : this.openaiApiKey;
+  private getApiKey(provider: string) {
+    return provider === 'gemini' ? this.geminiApiKey : this.openaiApiKey;
   }
 
-  async chat(message: string) {
-    const apiKey = this.apiKey;
+  async chat(message: string, provider?: string) {
+    const aiProvider = provider?.trim()?.toLowerCase() || this.aiProvider;
+    const apiKey = this.getApiKey(aiProvider);
+
     if (!apiKey) {
-      const missingKey = this.aiProvider === 'gemini' ? 'GEMINI_API_KEY' : 'OPENAI_API_KEY';
+      const missingKey = aiProvider === 'gemini' ? 'GEMINI_API_KEY' : 'OPENAI_API_KEY';
       throw new InternalServerErrorException(`${missingKey} is not configured`);
     }
 
-    if (this.aiProvider === 'gemini') {
+    if (aiProvider === 'gemini') {
       return this.geminiChat(message, apiKey);
     }
 
