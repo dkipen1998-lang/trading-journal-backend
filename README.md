@@ -59,6 +59,10 @@ cp .env.example .env
   ```bash
   openssl rand -hex 32
   ```
+- `AI_PROVIDER` — `openai` або `gemini` (за замовчуванням `openai`)
+- `OPENAI_API_KEY` — потрібен, якщо використовуєш `openai`
+- `GEMINI_API_KEY` — потрібен, якщо використовуєш `gemini`
+- `GEMINI_MODEL` — опціонально, наприклад `gemini-1.5`
 - `DATABASE_URL` — залиш дефолт, якщо використовуєш `docker compose` з кроку 2
 
 ## Крок 4 — застосуй схему БД
