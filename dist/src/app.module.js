@@ -22,6 +22,7 @@ const export_module_1 = require("./export/export.module");
 const news_module_1 = require("./news/news.module");
 const ai_module_1 = require("./ai/ai.module");
 const market_module_1 = require("./market/market.module");
+const app_controller_1 = require("./app.controller");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -43,6 +44,7 @@ exports.AppModule = AppModule = __decorate([
             ai_module_1.AiModule,
             market_module_1.MarketModule,
         ],
+        controllers: [app_controller_1.AppController],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map
