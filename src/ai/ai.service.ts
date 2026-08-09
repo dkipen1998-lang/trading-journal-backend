@@ -1,5 +1,5 @@
 // backend file
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -31,8 +31,21 @@ export class AiService {
     const apiKey = this.getApiKey(aiProvider);
 
     if (!apiKey) {
+      // Try to gracefully fall back to the other provider if its key is available
+      const fallbackProvider = aiProvider === 'gemini' ? 'openai' : 'gemini';
+      const fallbackKey = this.getApiKey(fallbackProvider);
+      if (fallbackKey) {
+        console.warn(`Requested provider '${aiProvider}' missing API key; falling back to '${fallbackProvider}'.`);
+        // switch provider and apiKey to fallback
+        if (fallbackProvider === 'gemini') {
+          return this.geminiChat(message, fallbackKey);
+        }
+        return this.openaiChat(message, fallbackKey);
+      }
+
       const missingKey = aiProvider === 'gemini' ? 'GEMINI_API_KEY' : 'OPENAI_API_KEY';
-      throw new InternalServerErrorException(`${missingKey} is not configured`);
+      // Missing both keys — return a clear client error instead of generic 500
+      throw new BadRequestException(`${missingKey} is not configured`);
     }
 
     if (aiProvider === 'gemini') {
