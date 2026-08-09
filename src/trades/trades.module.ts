@@ -1,3 +1,4 @@
+// backend file
 import { Module } from '@nestjs/common';
 import { TradesController } from './trades.controller';
 import { TradesService } from './trades.service';
@@ -8,3 +9,4 @@ import { TradesService } from './trades.service';
   exports: [TradesService],
 })
 export class TradesModule {}
+

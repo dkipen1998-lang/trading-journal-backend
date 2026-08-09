@@ -1,3 +1,4 @@
+// backend file
 import { IsNotEmpty, IsString } from 'class-validator';
 
 export class TelegramLoginDto {
@@ -8,3 +9,4 @@ export class TelegramLoginDto {
   body?: { initData?: string };
   payload?: { initData?: string };
 }
+

@@ -1,3 +1,4 @@
+// backend file
 import { IsISO8601, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CloseTradeDto {
@@ -33,3 +34,4 @@ export class CloseTradeDto {
   @IsNumber()
   rMultiple?: number;
 }
+

@@ -1,3 +1,4 @@
+// backend file
 import { Controller, Get } from '@nestjs/common';
 import { NewsService } from './news.service';
 
@@ -10,3 +11,4 @@ export class NewsController {
     return this.newsService.fetchLatestNews();
   }
 }
+

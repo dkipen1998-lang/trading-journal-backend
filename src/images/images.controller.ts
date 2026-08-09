@@ -1,3 +1,4 @@
+// backend file
 import { Body, Controller, Delete, Param, Post, UseGuards } from '@nestjs/common';
 import { IsIn, IsNotEmpty, IsString, IsUrl } from 'class-validator';
 import { TelegramAuthGuard } from '../auth/telegram-auth.guard';
@@ -38,3 +39,4 @@ export class ImagesController {
     return this.images.remove(userId, id);
   }
 }
+

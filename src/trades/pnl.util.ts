@@ -1,3 +1,4 @@
+// backend file
 // Mirrors calcPnl() from the frontend so stored numbers always match what
 // the UI would compute, unless the user has typed a manual override.
 export function calcPnl(params: {
@@ -32,3 +33,4 @@ export function calcPnl(params: {
     rMultiple: rMultiple != null ? +rMultiple.toFixed(2) : null,
   };
 }
+

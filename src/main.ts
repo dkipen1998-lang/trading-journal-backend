@@ -1,3 +1,4 @@
+// backend file
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
@@ -25,3 +26,4 @@ async function bootstrap() {
   console.log(`Trading Journal API running on http://0.0.0.0:${port}/api`);
 }
 bootstrap();
+

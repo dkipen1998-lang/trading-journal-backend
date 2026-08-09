@@ -1,3 +1,4 @@
+// backend file
 import { IsIn, IsOptional, IsString } from 'class-validator';
 
 export class ChatAiDto {
@@ -9,3 +10,4 @@ export class ChatAiDto {
   @IsIn(['openai', 'gemini'])
   provider?: string;
 }
+

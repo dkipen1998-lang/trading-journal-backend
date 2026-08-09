@@ -1,3 +1,4 @@
+// backend file
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as crypto from 'crypto';
@@ -39,3 +40,4 @@ export class ImagesService {
     return { deleted: true };
   }
 }
+

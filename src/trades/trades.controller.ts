@@ -1,3 +1,4 @@
+// backend file
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { TelegramAuthGuard } from '../auth/telegram-auth.guard';
 import { CurrentUserId } from '../common/current-user.decorator';
@@ -47,3 +48,4 @@ export class TradesController {
     return this.trades.remove(userId, id);
   }
 }
+

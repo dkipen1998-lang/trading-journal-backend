@@ -1,3 +1,4 @@
+// backend file
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateTradeDto } from './create-trade.dto';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
@@ -21,3 +22,4 @@ export class UpdateTradeDto extends PartialType(CreateTradeDto) {
   @IsString()
   postComment?: string;
 }
+

@@ -1,3 +1,4 @@
+// backend file
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 const FINNHUB_BASE = 'https://finnhub.io/api/v1';
@@ -43,3 +44,4 @@ export class MarketService {
     return this.requestFinnhub(`/stock/candle?symbol=${encodeURIComponent(symbol)}&resolution=${encodeURIComponent(resolution)}&from=${from}&to=${to}`);
   }
 }
+

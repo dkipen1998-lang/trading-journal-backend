@@ -1,3 +1,4 @@
+// backend file
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { TelegramAuthGuard } from '../auth/telegram-auth.guard';
 import { CurrentUserId } from '../common/current-user.decorator';
@@ -28,3 +29,4 @@ export class StatsController {
     return this.stats.byMonth(userId);
   }
 }
+

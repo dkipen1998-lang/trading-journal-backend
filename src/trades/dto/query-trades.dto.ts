@@ -1,3 +1,4 @@
+// backend file
 import { Type } from 'class-transformer';
 import { IsIn, IsInt, IsISO8601, IsOptional, IsString, Min } from 'class-validator';
 
@@ -54,3 +55,4 @@ export class QueryTradesDto {
   @Min(1)
   limit?: number = 20;
 }
+

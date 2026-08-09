@@ -1,3 +1,4 @@
+// backend file
 import { IsArray, IsIn, IsISO8601, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateTradeDto {
@@ -58,3 +59,4 @@ export class CreateTradeDto {
   @IsString({ each: true })
   tags?: string[];
 }
+

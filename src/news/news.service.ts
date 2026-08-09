@@ -1,3 +1,4 @@
+// backend file
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 const FINNHUB_BASE = 'https://finnhub.io/api/v1';
@@ -131,3 +132,4 @@ export class NewsService {
       .slice(0, 10);
   }
 }
+

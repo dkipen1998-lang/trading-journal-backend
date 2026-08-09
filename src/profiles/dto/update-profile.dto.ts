@@ -1,3 +1,4 @@
+// backend file
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateProfileDto {
@@ -17,3 +18,4 @@ export class UpdateProfileDto {
   @IsOptional()
   settings?: any;
 }
+

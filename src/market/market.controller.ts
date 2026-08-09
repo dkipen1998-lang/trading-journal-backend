@@ -1,3 +1,4 @@
+// backend file
 import { Controller, Get, Query, BadRequestException } from '@nestjs/common';
 import { MarketService } from './market.service';
 
@@ -39,3 +40,4 @@ export class MarketController {
     return this.marketService.getCandles(symbol.trim().toUpperCase(), resolution, fromTs, toTs);
   }
 }
+

@@ -1,3 +1,4 @@
+// backend file
 import * as crypto from 'crypto';
 
 /**
@@ -38,3 +39,4 @@ export function parseTelegramUser(initData: string): TelegramUserPayload | null 
     return null;
   }
 }
+
