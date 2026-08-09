@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { TradesModule } from './trades/trades.module';
 import { TagsModule } from './tags/tags.module';
 import { SetupsModule } from './setups/setups.module';
+<<<<<<< HEAD
 import { ProfilesModule } from './profiles/profiles.module';
 import { ImagesModule } from './images/images.module';
 import { StatsModule } from './stats/stats.module';
@@ -14,6 +15,11 @@ import { NewsModule } from './news/news.module';
 import { AiModule } from './ai/ai.module';
 import { MarketModule } from './market/market.module';
 import { AppController } from './app.controller';
+=======
+import { ImagesModule } from './images/images.module';
+import { StatsModule } from './stats/stats.module';
+import { ExportModule } from './export/export.module';
+>>>>>>> ca97032 (Prepare deployment)
 
 @Module({
   imports: [
@@ -24,6 +30,7 @@ import { AppController } from './app.controller';
     TradesModule,
     TagsModule,
     SetupsModule,
+<<<<<<< HEAD
     ProfilesModule,
     ImagesModule,
     StatsModule,
@@ -33,5 +40,11 @@ import { AppController } from './app.controller';
     MarketModule,
   ],
   controllers: [AppController],
+=======
+    ImagesModule,
+    StatsModule,
+    ExportModule,
+  ],
+>>>>>>> ca97032 (Prepare deployment)
 })
 export class AppModule {}
