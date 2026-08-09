@@ -71,13 +71,22 @@ export class AiService {
 
   private async geminiChat(message: string, apiKey: string) {
     const model = this.geminiModel;
-    const url = `https://gemini.googleapis.com/v1/models/${encodeURIComponent(model)}:generateText?key=${encodeURIComponent(apiKey)}`;
+    const urlBase = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(model)}:generateText`;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    let url = urlBase;
+    if (apiKey.startsWith('AIza')) {
+      url = `${urlBase}?key=${encodeURIComponent(apiKey)}`;
+    } else {
+      headers.Authorization = `Bearer ${apiKey}`;
+    }
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({
         prompt: {
           text: message,
