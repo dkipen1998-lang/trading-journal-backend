@@ -19,21 +19,7 @@ export class AiService {
   }
 
   private get geminiModel() {
-    return this.configService.get<string>('GEMINI_MODEL')?.trim() || 'gemini-1.5';
-  }
-
-  private get geminiEndpoint() {
-    const configured = this.configService.get<string>('GEMINI_ENDPOINT')?.trim();
-    if (configured) {
-      return configured.replace(/\/$/, '');
-    }
-
-    const model = this.geminiModel.toLowerCase();
-    if (model.startsWith('gemini-')) {
-      return 'https://gemini.googleapis.com';
-    }
-
-    return 'https://generativelanguage.googleapis.com';
+    return this.configService.get<string>('GEMINI_MODEL')?.trim() || 'text-bison-001';
   }
 
   private getApiKey(provider: string) {
@@ -85,7 +71,12 @@ export class AiService {
 
   private async geminiChat(message: string, apiKey: string) {
     const model = this.geminiModel;
-    const endpoint = this.geminiEndpoint;
+    const apiKeyIsGoogleApiKey = apiKey.startsWith('AIza');
+    const configuredEndpoint = this.configService.get<string>('GEMINI_ENDPOINT')?.trim();
+    const normalizedEndpoint = configuredEndpoint ? configuredEndpoint.replace(/\/$/, '') : '';
+    const endpoint = normalizedEndpoint
+      || (apiKeyIsGoogleApiKey ? 'https://generativelanguage.googleapis.com' : model.toLowerCase().startsWith('gemini-') ? 'https://gemini.googleapis.com' : 'https://generativelanguage.googleapis.com');
+
     const urlBase = `${endpoint}/v1/models/${encodeURIComponent(model)}:generateText`;
 
     const headers: Record<string, string> = {
@@ -93,7 +84,7 @@ export class AiService {
     };
 
     let url = urlBase;
-    if (apiKey.startsWith('AIza')) {
+    if (apiKeyIsGoogleApiKey) {
       url = `${urlBase}?key=${encodeURIComponent(apiKey)}`;
     } else {
       headers.Authorization = `Bearer ${apiKey}`;
