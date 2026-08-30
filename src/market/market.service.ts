@@ -3,9 +3,39 @@ import { Injectable, InternalServerErrorException, BadRequestException } from '@
 
 const FINNHUB_BASE = 'https://finnhub.io/api/v1';
 const BINANCE_BASE = 'https://fapi.binance.com';
+const BINANCE_REQUEST_LIMIT_PER_MINUTE = 5;
+const BINANCE_REQUEST_WINDOW_MS = 60_000;
 
 @Injectable()
 export class MarketService {
+  private static binanceRequestTimestamps: number[] = [];
+
+  static getNextBinanceRequestDelay(timestamps: number[] = MarketService.binanceRequestTimestamps, now: number = Date.now()): number {
+    const recentTimestamps = timestamps.filter((ts) => ts > now - BINANCE_REQUEST_WINDOW_MS);
+    if (recentTimestamps.length < BINANCE_REQUEST_LIMIT_PER_MINUTE) {
+      return 0;
+    }
+
+    const oldest = recentTimestamps[0];
+    return Math.max(0, BINANCE_REQUEST_WINDOW_MS - (now - oldest));
+  }
+
+  private static async waitForBinanceRequestSlot(): Promise<void> {
+    while (true) {
+      const now = Date.now();
+      const recentTimestamps = MarketService.binanceRequestTimestamps.filter((ts) => ts > now - BINANCE_REQUEST_WINDOW_MS);
+      const delay = MarketService.getNextBinanceRequestDelay(recentTimestamps, now);
+
+      if (delay === 0) {
+        recentTimestamps.push(now);
+        MarketService.binanceRequestTimestamps = recentTimestamps;
+        return;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
   private get finnhubApiKey(): string {
     return process.env.FINNHUB_API_KEY?.trim() || '';
   }
@@ -37,6 +67,7 @@ export class MarketService {
   }
 
   private async requestBinance(path: string): Promise<any> {
+    await MarketService.waitForBinanceRequestSlot();
     const url = `${BINANCE_BASE}${path}`;
     try {
       const response = await fetch(url, {

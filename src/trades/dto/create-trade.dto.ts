@@ -52,6 +52,14 @@ export class CreateTradeDto {
 
   @IsOptional()
   @IsString()
+  entryScreenshot?: string;
+
+  @IsOptional()
+  @IsString()
+  exitScreenshot?: string;
+
+  @IsOptional()
+  @IsString()
   profileId?: string;
 
   @IsOptional()

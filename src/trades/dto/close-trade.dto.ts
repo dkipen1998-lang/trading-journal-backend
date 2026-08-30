@@ -20,6 +20,10 @@ export class CloseTradeDto {
   @IsString()
   postComment?: string;
 
+  @IsOptional()
+  @IsString()
+  exitScreenshot?: string;
+
   // If the user typed these manually in the close form, respect them
   // instead of overwriting with the server-computed values.
   @IsOptional()
