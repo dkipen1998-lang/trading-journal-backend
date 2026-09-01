@@ -39,6 +39,11 @@ __decorate([
 ], CloseTradeDto.prototype, "postComment", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CloseTradeDto.prototype, "exitScreenshot", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], CloseTradeDto.prototype, "pnl", void 0);

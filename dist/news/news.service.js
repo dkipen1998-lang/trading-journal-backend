@@ -92,8 +92,12 @@ let NewsService = class NewsService {
         if (!response.ok) {
             throw new Error(`SEC EDGAR request failed with ${response.status}`);
         }
-        const data = await response.json();
-        const hits = data?.hits?.hits || data?.result?.hits?.hits || [];
+        const data = (await response.json());
+        const hits = Array.isArray(data?.hits?.hits)
+            ? data.hits.hits
+            : Array.isArray(data?.result?.hits?.hits)
+                ? data.result.hits.hits
+                : [];
         if (!Array.isArray(hits)) {
             return [];
         }

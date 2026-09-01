@@ -24,8 +24,18 @@ let TradesService = class TradesService {
     shape(trade) {
         if (!trade)
             return trade;
-        const { tradeTags, ...rest } = trade;
-        return { ...rest, tags: (tradeTags ?? []).map((tt) => tt.tag.name) };
+        const { tradeTags, images, ...rest } = trade;
+        const mappedImages = (images ?? []).reduce((acc, image) => {
+            if (image?.imageType && typeof image.imageUrl === 'string') {
+                acc[`${image.imageType}Screenshot`] = image.imageUrl;
+            }
+            return acc;
+        }, {});
+        return {
+            ...rest,
+            ...mappedImages,
+            tags: (tradeTags ?? []).map((tt) => tt.tag.name),
+        };
     }
     async list(userId, query) {
         const { status, side, result, setup, timeframe, profileId, tag, search, dateFrom, dateTo, page = 1, limit = 20 } = query;
@@ -99,8 +109,18 @@ let TradesService = class TradesService {
             });
         }
     }
+    async syncTradeScreenshots(tradeId, trade) {
+        const screenshots = [
+            trade.entryScreenshot ? { tradeId, imageType: 'entry', imageUrl: trade.entryScreenshot } : null,
+            trade.exitScreenshot ? { tradeId, imageType: 'exit', imageUrl: trade.exitScreenshot } : null,
+        ].filter(Boolean);
+        if (!screenshots.length)
+            return;
+        await this.prisma.tradeImage.deleteMany({ where: { tradeId } });
+        await this.prisma.tradeImage.createMany({ data: screenshots });
+    }
     async create(userId, dto) {
-        const { tags, ...data } = dto;
+        const { tags, entryScreenshot, exitScreenshot, ...data } = dto;
         const trade = await this.prisma.trade.create({
             data: {
                 userId,
@@ -122,11 +142,12 @@ let TradesService = class TradesService {
             },
         });
         await this.syncTags(userId, trade.id, tags);
+        await this.syncTradeScreenshots(trade.id, { entryScreenshot, exitScreenshot });
         return this.findOne(userId, trade.id);
     }
     async update(userId, id, dto) {
         const existing = await this.ensureOwned(userId, id);
-        const { tags, pnl, pnlPercent, rMultiple, ...rest } = dto;
+        const { tags, pnl, pnlPercent, rMultiple, entryScreenshot, exitScreenshot, ...rest } = dto;
         const hasManualOverride = pnl !== undefined || pnlPercent !== undefined || rMultiple !== undefined;
         const merged = { ...existing, ...rest };
         const computed = hasManualOverride
@@ -149,11 +170,15 @@ let TradesService = class TradesService {
             },
         });
         await this.syncTags(userId, id, tags);
+        await this.syncTradeScreenshots(id, { entryScreenshot, exitScreenshot });
         return this.findOne(userId, id);
     }
     async close(userId, id, dto) {
         const existing = await this.ensureOwned(userId, id);
         const hasManualOverride = dto.pnl !== undefined || dto.pnlPercent !== undefined || dto.rMultiple !== undefined;
+        if (dto.exitScreenshot) {
+            await this.syncTradeScreenshots(id, { exitScreenshot: dto.exitScreenshot });
+        }
         const computed = hasManualOverride
             ? { pnl: dto.pnl, pnlPercent: dto.pnlPercent, rMultiple: dto.rMultiple }
             : (0, pnl_util_1.calcPnl)({
