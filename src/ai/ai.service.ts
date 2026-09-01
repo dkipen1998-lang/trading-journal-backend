@@ -75,8 +75,11 @@ export class AiService {
       throw new InternalServerErrorException(`OpenAI request failed: ${response.status} ${responseText}`);
     }
 
-    const data = await response.json();
-    const text = data?.choices?.[0]?.message?.content;
+    const data = (await response.json()) as {
+      choices?: Array<{ message?: { content?: string | null } }>;
+    } | undefined;
+
+    const text = data?.choices?.[0]?.message?.content ?? '';
     return {
       text: typeof text === 'string' ? text.trim() : '',
     };
@@ -120,8 +123,11 @@ export class AiService {
       throw new InternalServerErrorException(`Gemini request failed: ${response.status} ${responseText}`);
     }
 
-    const data = await response.json();
-    const text = data?.candidates?.[0]?.output || data?.candidates?.[0]?.content || '';
+    const data = (await response.json()) as {
+      candidates?: Array<{ output?: string | null; content?: string | null }>;
+    } | undefined;
+
+    const text = data?.candidates?.[0]?.output ?? data?.candidates?.[0]?.content ?? '';
     return {
       text: typeof text === 'string' ? text.trim() : '',
     };
