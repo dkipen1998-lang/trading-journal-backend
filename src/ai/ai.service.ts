@@ -19,7 +19,7 @@ export class AiService {
   }
 
   private get geminiModel() {
-    return this.configService.get<string>('GEMINI_MODEL')?.trim() || 'text-bison-001';
+    return this.configService.get<string>('GEMINI_MODEL')?.trim() || 'gemini-1.5-flash';
   }
 
   private getApiKey(provider: string) {
@@ -90,47 +90,67 @@ export class AiService {
     const apiKeyIsGoogleApiKey = apiKey.startsWith('AIza');
     const configuredEndpoint = this.configService.get<string>('GEMINI_ENDPOINT')?.trim();
     const normalizedEndpoint = configuredEndpoint ? configuredEndpoint.replace(/\/$/, '') : '';
-    const endpoint = normalizedEndpoint
-      || (apiKeyIsGoogleApiKey ? 'https://generativelanguage.googleapis.com' : model.toLowerCase().startsWith('gemini-') ? 'https://gemini.googleapis.com' : 'https://generativelanguage.googleapis.com');
-
-    const urlBase = `${endpoint}/v1/models/${encodeURIComponent(model)}:generateText`;
+    const endpoint = normalizedEndpoint || 'https://generativelanguage.googleapis.com';
+    const requestUrlBase = `${endpoint}/v1beta/models/${encodeURIComponent(model)}`;
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
-    let url = urlBase;
-    if (apiKeyIsGoogleApiKey) {
-      url = `${urlBase}?key=${encodeURIComponent(apiKey)}`;
-    } else {
-      headers.Authorization = `Bearer ${apiKey}`;
-    }
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        prompt: {
-          text: message,
-        },
+    const body = JSON.stringify({
+      contents: [{
+        parts: [{ text: message }],
+      }],
+      generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 500,
-      }),
+      },
     });
 
-    if (!response.ok) {
-      const responseText = await response.text();
-      throw new InternalServerErrorException(`Gemini request failed: ${response.status} ${responseText}`);
+    const requests = [
+      {
+        url: apiKeyIsGoogleApiKey ? `${requestUrlBase}:generateContent?key=${encodeURIComponent(apiKey)}` : `${requestUrlBase}:generateContent`,
+        headers: apiKeyIsGoogleApiKey ? headers : { ...headers, Authorization: `Bearer ${apiKey}` },
+        body,
+      },
+    ];
+
+    let lastError: { status: number; body: string } | null = null;
+    for (const request of requests) {
+      const response = await fetch(request.url, {
+        method: 'POST',
+        headers: request.headers,
+        body: request.body,
+      });
+
+      if (response.ok) {
+        const data = (await response.json()) as {
+          candidates?: Array<{
+            output?: string | null;
+            content?: { parts?: Array<{ text?: string | null }> | null } | null;
+          }>;
+        } | undefined;
+
+        const text = data?.candidates?.[0]?.content?.parts?.map((part) => part.text ?? '').join('')
+          || data?.candidates?.[0]?.output
+          || '';
+
+        return {
+          text: typeof text === 'string' ? text.trim() : '',
+        };
+      }
+
+      lastError = {
+        status: response.status,
+        body: await response.text(),
+      };
     }
 
-    const data = (await response.json()) as {
-      candidates?: Array<{ output?: string | null; content?: string | null }>;
-    } | undefined;
+    if (lastError) {
+      throw new InternalServerErrorException(`Gemini request failed: ${lastError.status} ${lastError.body}`);
+    }
 
-    const text = data?.candidates?.[0]?.output ?? data?.candidates?.[0]?.content ?? '';
-    return {
-      text: typeof text === 'string' ? text.trim() : '',
-    };
+    throw new InternalServerErrorException('Gemini request failed');
   }
 }
 
