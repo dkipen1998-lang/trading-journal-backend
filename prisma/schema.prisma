@@ -70,6 +70,7 @@ model Trade {
   stopLoss     Decimal? @map("stop_loss") @db.Decimal(18, 6)
   takeProfit   Decimal? @map("take_profit") @db.Decimal(18, 6)
   positionSize Decimal? @map("position_size") @db.Decimal(18, 6)
+  leverage     Decimal? @db.Decimal(18, 6)
   riskDollar   Decimal? @map("risk_dollar") @db.Decimal(18, 2)
   riskPercent  Decimal? @map("risk_percent") @db.Decimal(6, 2)
   timeframe    String?

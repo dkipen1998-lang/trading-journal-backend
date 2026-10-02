@@ -111,13 +111,19 @@ let TradesService = class TradesService {
     }
     async syncTradeScreenshots(tradeId, trade) {
         const screenshots = [
-            trade.entryScreenshot ? { tradeId, imageType: 'entry', imageUrl: trade.entryScreenshot } : null,
-            trade.exitScreenshot ? { tradeId, imageType: 'exit', imageUrl: trade.exitScreenshot } : null,
-        ].filter(Boolean);
-        if (!screenshots.length)
-            return;
-        await this.prisma.tradeImage.deleteMany({ where: { tradeId } });
-        await this.prisma.tradeImage.createMany({ data: screenshots });
+            { imageType: 'entry', imageUrl: trade.entryScreenshot },
+            { imageType: 'exit', imageUrl: trade.exitScreenshot },
+        ];
+        for (const screenshot of screenshots) {
+            if (screenshot.imageUrl === undefined)
+                continue;
+            await this.prisma.tradeImage.deleteMany({ where: { tradeId, imageType: screenshot.imageType } });
+            if (screenshot.imageUrl) {
+                await this.prisma.tradeImage.create({
+                    data: { tradeId, imageType: screenshot.imageType, imageUrl: screenshot.imageUrl },
+                });
+            }
+        }
     }
     async create(userId, dto) {
         const { tags, entryScreenshot, exitScreenshot, ...data } = dto;
@@ -133,6 +139,7 @@ let TradesService = class TradesService {
                 stopLoss: data.stopLoss,
                 takeProfit: data.takeProfit,
                 positionSize: data.positionSize,
+                leverage: data.leverage,
                 riskDollar: data.riskDollar,
                 riskPercent: data.riskPercent,
                 timeframe: data.timeframe,
@@ -219,6 +226,7 @@ let TradesService = class TradesService {
                 stopLoss: source.stopLoss,
                 takeProfit: source.takeProfit,
                 positionSize: source.positionSize,
+                leverage: source.leverage,
                 riskDollar: source.riskDollar,
                 riskPercent: source.riskPercent,
                 timeframe: source.timeframe,

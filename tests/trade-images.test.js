@@ -56,3 +56,36 @@ test('trade shape exposes entry and exit screenshots from trade_images', () => {
   assert.equal(result.exitScreenshot, 'data:image/png;base64,exit');
   assert.deepEqual(result.tags, ['alpha']);
 });
+
+test('updating one screenshot only replaces that image type', async () => {
+  const operations = [];
+  const service = new TradesService({
+    tradeImage: {
+      deleteMany: async ({ where }) => operations.push({ operation: 'delete', where }),
+      create: async ({ data }) => operations.push({ operation: 'create', data }),
+    },
+  });
+
+  await service.syncTradeScreenshots('trade-1', { exitScreenshot: 'data:image/png;base64,new-exit' });
+
+  assert.deepEqual(operations, [
+    { operation: 'delete', where: { tradeId: 'trade-1', imageType: 'exit' } },
+    { operation: 'create', data: { tradeId: 'trade-1', imageType: 'exit', imageUrl: 'data:image/png;base64,new-exit' } },
+  ]);
+});
+
+test('clearing one screenshot does not remove the other image type', async () => {
+  const operations = [];
+  const service = new TradesService({
+    tradeImage: {
+      deleteMany: async ({ where }) => operations.push({ operation: 'delete', where }),
+      create: async ({ data }) => operations.push({ operation: 'create', data }),
+    },
+  });
+
+  await service.syncTradeScreenshots('trade-1', { entryScreenshot: null });
+
+  assert.deepEqual(operations, [
+    { operation: 'delete', where: { tradeId: 'trade-1', imageType: 'entry' } },
+  ]);
+});

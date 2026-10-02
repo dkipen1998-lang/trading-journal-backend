@@ -32,6 +32,10 @@ export class CreateTradeDto {
 
   @IsOptional()
   @IsNumber()
+  leverage?: number;
+
+  @IsOptional()
+  @IsNumber()
   riskDollar?: number;
 
   @IsOptional()

@@ -107,16 +107,22 @@ export class TradesService {
     }
   }
 
-  private async syncTradeScreenshots(tradeId: string, trade: { entryScreenshot?: string; exitScreenshot?: string }) {
+  private async syncTradeScreenshots(tradeId: string, trade: { entryScreenshot?: string | null; exitScreenshot?: string | null }) {
     const screenshots = [
-      trade.entryScreenshot ? { tradeId, imageType: 'entry', imageUrl: trade.entryScreenshot } : null,
-      trade.exitScreenshot ? { tradeId, imageType: 'exit', imageUrl: trade.exitScreenshot } : null,
-    ].filter(Boolean) as { tradeId: string; imageType: 'entry' | 'exit'; imageUrl: string }[];
+      { imageType: 'entry' as const, imageUrl: trade.entryScreenshot },
+      { imageType: 'exit' as const, imageUrl: trade.exitScreenshot },
+    ];
 
-    if (!screenshots.length) return;
+    for (const screenshot of screenshots) {
+      if (screenshot.imageUrl === undefined) continue;
 
-    await this.prisma.tradeImage.deleteMany({ where: { tradeId } });
-    await this.prisma.tradeImage.createMany({ data: screenshots });
+      await this.prisma.tradeImage.deleteMany({ where: { tradeId, imageType: screenshot.imageType } });
+      if (screenshot.imageUrl) {
+        await this.prisma.tradeImage.create({
+          data: { tradeId, imageType: screenshot.imageType, imageUrl: screenshot.imageUrl },
+        });
+      }
+    }
   }
 
   async create(userId: string, dto: CreateTradeDto) {
@@ -133,6 +139,7 @@ export class TradesService {
         stopLoss: data.stopLoss,
         takeProfit: data.takeProfit,
         positionSize: data.positionSize,
+        leverage: data.leverage,
         riskDollar: data.riskDollar,
         riskPercent: data.riskPercent,
         timeframe: data.timeframe,
@@ -230,6 +237,7 @@ export class TradesService {
         stopLoss: source.stopLoss,
         takeProfit: source.takeProfit,
         positionSize: source.positionSize,
+        leverage: source.leverage,
         riskDollar: source.riskDollar,
         riskPercent: source.riskPercent,
         timeframe: source.timeframe,
